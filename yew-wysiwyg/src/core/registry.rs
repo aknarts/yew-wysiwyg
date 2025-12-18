@@ -1,6 +1,6 @@
 //! Widget registry for managing available widget types
 
-use std::collections::HashMap;
+use indexmap::IndexMap;
 use std::rc::Rc;
 
 use crate::core::widget::{Widget, WidgetFactory};
@@ -9,7 +9,7 @@ use crate::error::{Error, Result};
 /// Registry for managing available widget types
 #[derive(Clone, Default)]
 pub struct WidgetRegistry {
-    factories: HashMap<String, Rc<dyn WidgetFactory>>,
+    factories: IndexMap<String, Rc<dyn WidgetFactory>>,
 }
 
 impl PartialEq for WidgetRegistry {
@@ -27,7 +27,7 @@ impl WidgetRegistry {
     /// Create a new empty registry
     pub fn new() -> Self {
         Self {
-            factories: HashMap::new(),
+            factories: IndexMap::new(),
         }
     }
 
@@ -79,23 +79,31 @@ impl WidgetRegistry {
 
         let mut registry = Self::new();
 
-        // Register container widgets
+        // Register layout/container widgets (in order)
         registry.register(container::RowContainer::factory()).ok();
         registry
             .register(container::ColumnContainer::factory())
             .ok();
         registry.register(container::GridContainer::factory()).ok();
         registry.register(container::Card::factory()).ok();
+        registry.register(basic::Spacer::factory()).ok();
 
-        // Register text widgets
-        registry.register(text::TextWidget::factory()).ok();
+        // Register text widgets (in order)
         registry.register(text::HeadingWidget::factory()).ok();
         registry.register(text::ParagraphWidget::factory()).ok();
+        registry.register(text::TextWidget::factory()).ok();
 
-        // Register basic widgets
+        // Register interactive widgets (in order)
         registry.register(basic::Button::factory()).ok();
-        registry.register(basic::Image::factory()).ok();
         registry.register(basic::Link::factory()).ok();
+        registry.register(basic::Image::factory()).ok();
+
+        // Register form widgets (in order)
+        registry.register(basic::TextInput::factory()).ok();
+        registry.register(basic::TextArea::factory()).ok();
+        registry.register(basic::Checkbox::factory()).ok();
+
+        // Register other widgets (in order)
         registry.register(basic::Divider::factory()).ok();
 
         registry

@@ -574,3 +574,604 @@ impl Widget for Divider {
         }
     }
 }
+/// Text Input widget
+#[derive(Default)]
+pub struct TextInput;
+
+impl TextInput {
+    pub fn factory() -> SimpleWidgetFactory<Self> {
+        SimpleWidgetFactory::new()
+    }
+}
+
+impl Widget for TextInput {
+    fn widget_type(&self) -> &'static str {
+        "form.textinput"
+    }
+
+    fn display_name(&self) -> &'static str {
+        "Text Input"
+    }
+
+    fn description(&self) -> &'static str {
+        "Single-line text input field"
+    }
+
+    fn icon(&self) -> Html {
+        html! { <span>{ "📝" }</span> }
+    }
+
+    fn default_config(&self) -> WidgetConfig {
+        WidgetConfig::new(self.widget_type())
+            .with_property("placeholder", serde_json::json!("Enter text..."))
+            .with_property("label", serde_json::json!(""))
+            .with_property("type", serde_json::json!("text"))
+            .with_style("width", "100%")
+            .with_style("padding", "8px 12px")
+            .with_style("border", "1px solid #d1d5db")
+            .with_style("border-radius", "4px")
+            .with_style("font-size", "14px")
+    }
+
+    fn render(&self, props: &WidgetProps) -> Html {
+        let placeholder = props
+            .config
+            .properties
+            .get("placeholder")
+            .and_then(|v| v.as_str())
+            .unwrap_or("Enter text...")
+            .to_string();
+
+        let label = props
+            .config
+            .properties
+            .get("label")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string();
+
+        let input_type = props
+            .config
+            .properties
+            .get("type")
+            .and_then(|v| v.as_str())
+            .unwrap_or("text")
+            .to_string();
+
+        let mut style = String::new();
+        for (k, v) in &props.config.inline_styles {
+            style.push_str(&format!("{}: {}; ", k, v));
+        }
+
+        let class = props.config.css_classes.join(" ");
+
+        html! {
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                if !label.is_empty() {
+                    <label style="font-weight: 500; font-size: 14px; color: #374151;">
+                        { label }
+                    </label>
+                }
+                <input
+                    type={input_type}
+                    placeholder={placeholder}
+                    {class}
+                    {style}
+                />
+            </div>
+        }
+    }
+
+    fn render_config_ui(&self, config: &WidgetConfig, on_change: Callback<WidgetConfig>) -> Html {
+        let placeholder = config
+            .properties
+            .get("placeholder")
+            .and_then(|v| v.as_str())
+            .unwrap_or("Enter text...")
+            .to_string();
+
+        let label = config
+            .properties
+            .get("label")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string();
+
+        let input_type = config
+            .properties
+            .get("type")
+            .and_then(|v| v.as_str())
+            .unwrap_or("text")
+            .to_string();
+
+        let config_clone = config.clone();
+        let on_placeholder_change = {
+            let on_change = on_change.clone();
+            Callback::from(move |e: InputEvent| {
+                if let Some(input) = e.target_dyn_into::<web_sys::HtmlInputElement>() {
+                    let mut new_config = config_clone.clone();
+                    new_config.set_property("placeholder", serde_json::json!(input.value()));
+                    on_change.emit(new_config);
+                }
+            })
+        };
+
+        let config_clone = config.clone();
+        let on_label_change = {
+            let on_change = on_change.clone();
+            Callback::from(move |e: InputEvent| {
+                if let Some(input) = e.target_dyn_into::<web_sys::HtmlInputElement>() {
+                    let mut new_config = config_clone.clone();
+                    new_config.set_property("label", serde_json::json!(input.value()));
+                    on_change.emit(new_config);
+                }
+            })
+        };
+
+        let config_clone = config.clone();
+        let on_type_change = {
+            Callback::from(move |e: Event| {
+                if let Some(select) = e.target_dyn_into::<web_sys::HtmlSelectElement>() {
+                    let mut new_config = config_clone.clone();
+                    new_config.set_property("type", serde_json::json!(select.value()));
+                    on_change.emit(new_config);
+                }
+            })
+        };
+
+        html! {
+            <div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; margin-bottom: 4px; font-weight: 500;">
+                        { "Label:" }
+                    </label>
+                    <input
+                        type="text"
+                        value={label}
+                        oninput={on_label_change}
+                        style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;"
+                    />
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; margin-bottom: 4px; font-weight: 500;">
+                        { "Placeholder:" }
+                    </label>
+                    <input
+                        type="text"
+                        value={placeholder}
+                        oninput={on_placeholder_change}
+                        style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;"
+                    />
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; margin-bottom: 4px; font-weight: 500;">
+                        { "Input Type:" }
+                    </label>
+                    <select
+                        value={input_type}
+                        onchange={on_type_change}
+                        style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;"
+                    >
+                        <option value="text">{ "Text" }</option>
+                        <option value="email">{ "Email" }</option>
+                        <option value="password">{ "Password" }</option>
+                        <option value="tel">{ "Telephone" }</option>
+                        <option value="url">{ "URL" }</option>
+                        <option value="number">{ "Number" }</option>
+                    </select>
+                </div>
+            </div>
+        }
+    }
+}
+
+/// Text Area widget
+#[derive(Default)]
+pub struct TextArea;
+
+impl TextArea {
+    pub fn factory() -> SimpleWidgetFactory<Self> {
+        SimpleWidgetFactory::new()
+    }
+}
+
+impl Widget for TextArea {
+    fn widget_type(&self) -> &'static str {
+        "form.textarea"
+    }
+
+    fn display_name(&self) -> &'static str {
+        "Text Area"
+    }
+
+    fn description(&self) -> &'static str {
+        "Multi-line text input field"
+    }
+
+    fn icon(&self) -> Html {
+        html! { <span>{ "📄" }</span> }
+    }
+
+    fn default_config(&self) -> WidgetConfig {
+        WidgetConfig::new(self.widget_type())
+            .with_property("placeholder", serde_json::json!("Enter text..."))
+            .with_property("label", serde_json::json!(""))
+            .with_property("rows", serde_json::json!(4))
+            .with_style("width", "100%")
+            .with_style("padding", "8px 12px")
+            .with_style("border", "1px solid #d1d5db")
+            .with_style("border-radius", "4px")
+            .with_style("font-size", "14px")
+            .with_style("font-family", "inherit")
+            .with_style("resize", "vertical")
+    }
+
+    fn render(&self, props: &WidgetProps) -> Html {
+        let placeholder = props
+            .config
+            .properties
+            .get("placeholder")
+            .and_then(|v| v.as_str())
+            .unwrap_or("Enter text...")
+            .to_string();
+
+        let label = props
+            .config
+            .properties
+            .get("label")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string();
+
+        let rows = props
+            .config
+            .properties
+            .get("rows")
+            .and_then(|v| v.as_u64())
+            .unwrap_or(4)
+            .to_string();
+
+        let mut style = String::new();
+        for (k, v) in &props.config.inline_styles {
+            style.push_str(&format!("{}: {}; ", k, v));
+        }
+
+        let class = props.config.css_classes.join(" ");
+
+        html! {
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                if !label.is_empty() {
+                    <label style="font-weight: 500; font-size: 14px; color: #374151;">
+                        { label }
+                    </label>
+                }
+                <textarea
+                    placeholder={placeholder}
+                    rows={rows}
+                    {class}
+                    {style}
+                />
+            </div>
+        }
+    }
+
+    fn render_config_ui(&self, config: &WidgetConfig, on_change: Callback<WidgetConfig>) -> Html {
+        let placeholder = config
+            .properties
+            .get("placeholder")
+            .and_then(|v| v.as_str())
+            .unwrap_or("Enter text...")
+            .to_string();
+
+        let label = config
+            .properties
+            .get("label")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string();
+
+        let rows = config
+            .properties
+            .get("rows")
+            .and_then(|v| v.as_u64())
+            .unwrap_or(4);
+
+        let config_clone = config.clone();
+        let on_placeholder_change = {
+            let on_change = on_change.clone();
+            Callback::from(move |e: InputEvent| {
+                if let Some(input) = e.target_dyn_into::<web_sys::HtmlInputElement>() {
+                    let mut new_config = config_clone.clone();
+                    new_config.set_property("placeholder", serde_json::json!(input.value()));
+                    on_change.emit(new_config);
+                }
+            })
+        };
+
+        let config_clone = config.clone();
+        let on_label_change = {
+            let on_change = on_change.clone();
+            Callback::from(move |e: InputEvent| {
+                if let Some(input) = e.target_dyn_into::<web_sys::HtmlInputElement>() {
+                    let mut new_config = config_clone.clone();
+                    new_config.set_property("label", serde_json::json!(input.value()));
+                    on_change.emit(new_config);
+                }
+            })
+        };
+
+        let config_clone = config.clone();
+        let on_rows_change = {
+            Callback::from(move |e: InputEvent| {
+                if let Some(input) = e.target_dyn_into::<web_sys::HtmlInputElement>() {
+                    if let Ok(rows) = input.value().parse::<u64>() {
+                        let mut new_config = config_clone.clone();
+                        new_config.set_property("rows", serde_json::json!(rows));
+                        on_change.emit(new_config);
+                    }
+                }
+            })
+        };
+
+        html! {
+            <div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; margin-bottom: 4px; font-weight: 500;">
+                        { "Label:" }
+                    </label>
+                    <input
+                        type="text"
+                        value={label}
+                        oninput={on_label_change}
+                        style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;"
+                    />
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; margin-bottom: 4px; font-weight: 500;">
+                        { "Placeholder:" }
+                    </label>
+                    <input
+                        type="text"
+                        value={placeholder}
+                        oninput={on_placeholder_change}
+                        style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;"
+                    />
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; margin-bottom: 4px; font-weight: 500;">
+                        { "Rows:" }
+                    </label>
+                    <input
+                        type="number"
+                        value={rows.to_string()}
+                        oninput={on_rows_change}
+                        min="1"
+                        max="20"
+                        style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;"
+                    />
+                </div>
+            </div>
+        }
+    }
+}
+
+/// Checkbox widget
+#[derive(Default)]
+pub struct Checkbox;
+
+impl Checkbox {
+    pub fn factory() -> SimpleWidgetFactory<Self> {
+        SimpleWidgetFactory::new()
+    }
+}
+
+impl Widget for Checkbox {
+    fn widget_type(&self) -> &'static str {
+        "form.checkbox"
+    }
+
+    fn display_name(&self) -> &'static str {
+        "Checkbox"
+    }
+
+    fn description(&self) -> &'static str {
+        "Checkbox input field"
+    }
+
+    fn icon(&self) -> Html {
+        html! { <span>{ "☑️" }</span> }
+    }
+
+    fn default_config(&self) -> WidgetConfig {
+        WidgetConfig::new(self.widget_type())
+            .with_property("label", serde_json::json!("Check me"))
+            .with_property("checked", serde_json::json!(false))
+    }
+
+    fn render(&self, props: &WidgetProps) -> Html {
+        let label = props
+            .config
+            .properties
+            .get("label")
+            .and_then(|v| v.as_str())
+            .unwrap_or("Check me");
+
+        let checked = props
+            .config
+            .properties
+            .get("checked")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false);
+
+        html! {
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <input
+                    type="checkbox"
+                    checked={checked}
+                    style="width: 16px; height: 16px; cursor: pointer;"
+                />
+                <label style="font-size: 14px; color: #374151; cursor: pointer;">
+                    { label }
+                </label>
+            </div>
+        }
+    }
+
+    fn render_config_ui(&self, config: &WidgetConfig, on_change: Callback<WidgetConfig>) -> Html {
+        let label = config
+            .properties
+            .get("label")
+            .and_then(|v| v.as_str())
+            .unwrap_or("Check me")
+            .to_string();
+
+        let checked = config
+            .properties
+            .get("checked")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false);
+
+        let config_clone = config.clone();
+        let on_label_change = {
+            let on_change = on_change.clone();
+            Callback::from(move |e: InputEvent| {
+                if let Some(input) = e.target_dyn_into::<web_sys::HtmlInputElement>() {
+                    let mut new_config = config_clone.clone();
+                    new_config.set_property("label", serde_json::json!(input.value()));
+                    on_change.emit(new_config);
+                }
+            })
+        };
+
+        let config_clone = config.clone();
+        let on_checked_change = {
+            Callback::from(move |e: Event| {
+                if let Some(input) = e.target_dyn_into::<web_sys::HtmlInputElement>() {
+                    let mut new_config = config_clone.clone();
+                    new_config.set_property("checked", serde_json::json!(input.checked()));
+                    on_change.emit(new_config);
+                }
+            })
+        };
+
+        html! {
+            <div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; margin-bottom: 4px; font-weight: 500;">
+                        { "Label:" }
+                    </label>
+                    <input
+                        type="text"
+                        value={label}
+                        oninput={on_label_change}
+                        style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;"
+                    />
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input
+                            type="checkbox"
+                            checked={checked}
+                            onchange={on_checked_change}
+                            style="width: 16px; height: 16px;"
+                        />
+                        <span style="font-weight: 500;">{ "Default Checked" }</span>
+                    </label>
+                </div>
+            </div>
+        }
+    }
+}
+
+/// Spacer widget for layout control
+#[derive(Default)]
+pub struct Spacer;
+
+impl Spacer {
+    pub fn factory() -> SimpleWidgetFactory<Self> {
+        SimpleWidgetFactory::new()
+    }
+}
+
+impl Widget for Spacer {
+    fn widget_type(&self) -> &'static str {
+        "layout.spacer"
+    }
+
+    fn display_name(&self) -> &'static str {
+        "Spacer"
+    }
+
+    fn description(&self) -> &'static str {
+        "Empty space for layout control"
+    }
+
+    fn icon(&self) -> Html {
+        html! { <span>{ "⬜" }</span> }
+    }
+
+    fn default_config(&self) -> WidgetConfig {
+        WidgetConfig::new(self.widget_type())
+            .with_property("height", serde_json::json!(20))
+            .with_style("width", "100%")
+    }
+
+    fn render(&self, props: &WidgetProps) -> Html {
+        let height = props
+            .config
+            .properties
+            .get("height")
+            .and_then(|v| v.as_u64())
+            .unwrap_or(20);
+
+        let mut style = format!("height: {}px; ", height);
+        for (k, v) in &props.config.inline_styles {
+            style.push_str(&format!("{}: {}; ", k, v));
+        }
+
+        let class = props.config.css_classes.join(" ");
+
+        html! {
+            <div {class} {style} />
+        }
+    }
+
+    fn render_config_ui(&self, config: &WidgetConfig, on_change: Callback<WidgetConfig>) -> Html {
+        let height = config
+            .properties
+            .get("height")
+            .and_then(|v| v.as_u64())
+            .unwrap_or(20);
+
+        let config_clone = config.clone();
+        let on_height_change = {
+            Callback::from(move |e: InputEvent| {
+                if let Some(input) = e.target_dyn_into::<web_sys::HtmlInputElement>() {
+                    if let Ok(height) = input.value().parse::<u64>() {
+                        let mut new_config = config_clone.clone();
+                        new_config.set_property("height", serde_json::json!(height));
+                        on_change.emit(new_config);
+                    }
+                }
+            })
+        };
+
+        html! {
+            <div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; margin-bottom: 4px; font-weight: 500;">
+                        { "Height (px):" }
+                    </label>
+                    <input
+                        type="number"
+                        value={height.to_string()}
+                        oninput={on_height_change}
+                        min="0"
+                        max="500"
+                        style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;"
+                    />
+                </div>
+            </div>
+        }
+    }
+}

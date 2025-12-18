@@ -68,7 +68,7 @@ rustup target add wasm32-unknown-unknown
 
 **Core Layer** (`yew-wysiwyg/src/core/`):
 - `widget.rs`: Defines `Widget`, `WidgetProps`, `WidgetConfig`, and `WidgetFactory` traits. WidgetConfig stores widget-specific properties, CSS classes, and inline styles.
-- `registry.rs`: `WidgetRegistry` manages available widget types and creates instances. Custom `PartialEq` implementation compares registries by widget type keys only (not factory closures).
+- `registry.rs`: `WidgetRegistry` manages available widget types and creates instances. Uses `IndexMap` to maintain insertion order for consistent widget palette display. Custom `PartialEq` implementation compares registries by widget type keys only (not factory closures).
 - `theme.rs`: `Theme` trait and `ThemeConfig` for CSS variables, global classes, and custom CSS injection.
 
 **Serialization Layer** (`yew-wysiwyg/src/serialization.rs`):
@@ -96,8 +96,11 @@ rustup target add wasm32-unknown-unknown
   - Edit/Preview mode toggle
 
 **Standard Widgets** (`yew-wysiwyg/src/widgets/`):
-- Container widgets (Row, Column, Grid) support children via `can_have_children()` returning true.
-- Text widgets store content and formatting options in WidgetConfig properties.
+- Container widgets (Row, Column, Grid, Card) support children via `can_have_children()` returning true.
+- Text widgets (Heading, Paragraph, Text) store content and formatting options in WidgetConfig properties.
+- Form widgets (TextInput, TextArea, Checkbox) provide configurable input fields with labels and validation support.
+- Interactive widgets (Button, Link, Image) support user interactions and content display.
+- Layout widgets (Spacer, Divider) provide visual spacing and separation.
 - Each widget provides `render_config_ui()` for property editing in the editor.
 - Helper functions `build_style()` and `build_class()` convert WidgetConfig to HTML attributes.
 

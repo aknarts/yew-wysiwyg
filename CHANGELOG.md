@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Auto-save functionality to browser localStorage
 - Auto-load from localStorage on editor initialization
 - Clear button with confirmation modal to reset editor and clear saved state
+- New form widgets: Text Input, Text Area, Checkbox
+- Spacer widget for layout control
+- Consistent widget ordering in palette using IndexMap
 
 ## [0.1.0] - 2025-12-17
 

@@ -60,11 +60,26 @@ The library includes standard widgets out of the box:
 - **Row Container**: Arranges children horizontally
 - **Column Container**: Arranges children vertically
 - **Grid Container**: Responsive grid layout
+- **Card**: Container with styling and padding
+- **Spacer**: Empty space for layout control
 
 ### Text Widgets
-- **Text**: Rich text with formatting (bold, italic, underline)
 - **Heading**: H1-H6 heading elements
 - **Paragraph**: Paragraph blocks
+- **Text**: Rich text with formatting (bold, italic, underline)
+
+### Interactive Widgets
+- **Button**: Clickable button with variants (primary, secondary, success, danger)
+- **Link**: Hyperlink with configurable target
+- **Image**: Image display with alt text
+
+### Form Widgets
+- **Text Input**: Single-line text input with type support (text, email, password, tel, url, number)
+- **Text Area**: Multi-line text input with configurable rows
+- **Checkbox**: Checkbox input with label
+
+### Other Widgets
+- **Divider**: Horizontal divider line
 
 ## Custom Widgets
 
