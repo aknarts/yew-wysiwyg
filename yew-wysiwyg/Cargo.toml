@@ -1,0 +1,43 @@
+[package]
+name = "yew-wysiwyg"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+description = "A flexible WYSIWYG editor for the Yew framework with drag-and-drop widgets, serialization, and extensible theming"
+readme = "../README.md"
+
+[dependencies]
+yew = { workspace = true }
+yew-hooks = { workspace = true }
+web-sys = { workspace = true, features = [
+    "HtmlElement",
+    "DragEvent",
+    "DataTransfer",
+    "Element",
+    "MouseEvent",
+    "Window",
+    "Document",
+    "HtmlSelectElement",
+    "HtmlTextAreaElement",
+    "CssStyleDeclaration",
+    "DomTokenList",
+] }
+wasm-bindgen = { workspace = true }
+js-sys = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+pulldown-cmark = { workspace = true }
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"
+
+[features]
+default = ["standard-widgets"]
+standard-widgets = []

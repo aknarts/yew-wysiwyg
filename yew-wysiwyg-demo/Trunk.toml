@@ -1,0 +1,18 @@
+[[hooks]]
+stage = "build"
+command = "sh"
+command_arguments = ["-c", "echo 'Building yew-wysiwyg-demo...'"]
+
+[build]
+target = "index.html"
+release = false
+dist = "dist"
+public_url = "/"
+
+[watch]
+ignore = ["dist"]
+
+[serve]
+address = "127.0.0.1"
+port = 8080
+open = false

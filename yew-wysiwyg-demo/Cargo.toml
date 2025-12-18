@@ -1,0 +1,15 @@
+[package]
+name = "yew-wysiwyg-demo"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+yew-wysiwyg = { path = "../yew-wysiwyg", features = ["standard-widgets"] }
+yew = { workspace = true }
+wasm-bindgen = { workspace = true }
+wasm-logger = { workspace = true }
+log = { workspace = true }
+gloo = { workspace = true }
