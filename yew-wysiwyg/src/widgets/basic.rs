@@ -183,7 +183,10 @@ impl Widget for Image {
 
     fn default_config(&self) -> WidgetConfig {
         WidgetConfig::new(self.widget_type())
-            .with_property("src", serde_json::json!("https://via.placeholder.com/400x300"))
+            .with_property(
+                "src",
+                serde_json::json!("https://via.placeholder.com/400x300"),
+            )
             .with_property("alt", serde_json::json!("Placeholder image"))
             .with_style("max-width", "100%")
             .with_style("height", "auto")
@@ -486,7 +489,10 @@ impl Widget for Divider {
             .and_then(|v| v.as_str())
             .unwrap_or("#e5e7eb");
 
-        let mut style = format!("border: none; border-top: {}px solid {}; ", thickness, color);
+        let mut style = format!(
+            "border: none; border-top: {}px solid {}; ",
+            thickness, color
+        );
         for (k, v) in &props.config.inline_styles {
             style.push_str(&format!("{}: {}; ", k, v));
         }

@@ -102,8 +102,8 @@ pub fn editor(props: &EditorProps) -> Html {
         props
             .initial_layout
             .clone()
-            .or_else(|| load_from_storage())
-            .unwrap_or_else(|| Layout::new())
+            .or_else(load_from_storage)
+            .unwrap_or_default()
     });
 
     let registry = use_memo(props.registry.clone(), |registry_prop| {
@@ -128,12 +128,7 @@ pub fn editor(props: &EditorProps) -> Html {
     let edit_mode = use_state(|| true);
 
     // History management for undo/redo
-    let history = use_state(|| {
-        vec![props
-            .initial_layout
-            .clone()
-            .unwrap_or_else(|| Layout::new())]
-    });
+    let history = use_state(|| vec![props.initial_layout.clone().unwrap_or_default()]);
     let history_index = use_state(|| 0usize);
 
     // Helper function to add a layout to history
@@ -215,7 +210,9 @@ pub fn editor(props: &EditorProps) -> Html {
             let add_as_child = if let Some(parent_id) = *selected_widget {
                 // Check if parent can have children
                 if let Some(parent_node) = new_layout.get_widget(&parent_id) {
-                    if let Ok(parent_widget) = registry.create_widget(&parent_node.config.widget_type) {
+                    if let Ok(parent_widget) =
+                        registry.create_widget(&parent_node.config.widget_type)
+                    {
                         parent_widget.can_have_children()
                     } else {
                         false
@@ -327,32 +324,37 @@ pub fn editor(props: &EditorProps) -> Html {
         let layout = layout.clone();
         let registry = registry.clone();
         let on_layout_change = props.on_layout_change.clone();
-        Callback::from(move |(widget_type, parent_id, position): (String, Option<WidgetId>, usize)| {
-            // Create widget with default config
-            if let Ok(widget) = registry.create_widget(&widget_type) {
-                let mut new_layout = (*layout).clone();
-                let id = WidgetId::new_v4();
-                let config = widget.default_config();
+        Callback::from(
+            move |(widget_type, parent_id, position): (String, Option<WidgetId>, usize)| {
+                // Create widget with default config
+                if let Ok(widget) = registry.create_widget(&widget_type) {
+                    let mut new_layout = (*layout).clone();
+                    let id = WidgetId::new_v4();
+                    let config = widget.default_config();
 
-                // Insert at the specified position
-                if let Some(parent_id) = parent_id {
-                    // Insert as child
-                    if new_layout.insert_child_widget(parent_id, id, config, position).is_ok() {
+                    // Insert at the specified position
+                    if let Some(parent_id) = parent_id {
+                        // Insert as child
+                        if new_layout
+                            .insert_child_widget(parent_id, id, config, position)
+                            .is_ok()
+                        {
+                            push_to_history(new_layout.clone());
+                            if let Some(callback) = &on_layout_change {
+                                callback.emit(new_layout);
+                            }
+                        }
+                    } else {
+                        // Insert as root
+                        new_layout.insert_root_widget(id, config, position);
                         push_to_history(new_layout.clone());
                         if let Some(callback) = &on_layout_change {
                             callback.emit(new_layout);
                         }
                     }
-                } else {
-                    // Insert as root
-                    new_layout.insert_root_widget(id, config, position);
-                    push_to_history(new_layout.clone());
-                    if let Some(callback) = &on_layout_change {
-                        callback.emit(new_layout);
-                    }
                 }
-            }
-        })
+            },
+        )
     };
 
     let on_import = {
@@ -418,8 +420,6 @@ pub fn editor(props: &EditorProps) -> Html {
     {
         let on_undo = on_undo.clone();
         let on_redo = on_redo.clone();
-        let can_undo = can_undo;
-        let can_redo = can_redo;
 
         use_effect(move || {
             let callback = {
@@ -436,7 +436,9 @@ pub fn editor(props: &EditorProps) -> Html {
                             e.prevent_default();
                             on_undo.emit(());
                         }
-                    } else if is_ctrl_or_cmd && (e.key() == "y" || (e.shift_key() && e.key() == "Z")) {
+                    } else if is_ctrl_or_cmd
+                        && (e.key() == "y" || (e.shift_key() && e.key() == "Z"))
+                    {
                         // Ctrl+Y or Ctrl+Shift+Z or Cmd+Y or Cmd+Shift+Z - Redo
                         if can_redo {
                             e.prevent_default();
@@ -447,10 +449,8 @@ pub fn editor(props: &EditorProps) -> Html {
             };
 
             let window = web_sys::window().expect("no global window exists");
-            let _ = window.add_event_listener_with_callback(
-                "keydown",
-                callback.as_ref().unchecked_ref(),
-            );
+            let _ = window
+                .add_event_listener_with_callback("keydown", callback.as_ref().unchecked_ref());
 
             // Cleanup
             move || {

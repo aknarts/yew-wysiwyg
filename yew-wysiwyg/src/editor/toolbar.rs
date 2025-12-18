@@ -24,7 +24,7 @@ pub struct ToolbarProps {
 #[function_component(Toolbar)]
 pub fn toolbar(props: &ToolbarProps) -> Html {
     let show_modal = use_state(|| false);
-    let json_content = use_state(|| String::new());
+    let json_content = use_state(String::new);
     let import_error = use_state(|| Option::<String>::None);
     let show_clear_confirm = use_state(|| false);
 

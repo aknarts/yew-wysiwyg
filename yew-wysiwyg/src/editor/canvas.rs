@@ -283,6 +283,7 @@ pub fn canvas(props: &CanvasProps) -> Html {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn render_widget_node(
     id: &WidgetId,
     layout: &Layout,
@@ -381,13 +382,17 @@ fn render_widget_node(
 
     // Prepare link attributes if this is a Link widget
     let (link_href, link_target, link_style, link_class) = if is_link_widget {
-        let href = node.config.properties
+        let href = node
+            .config
+            .properties
             .get("href")
             .and_then(|v| v.as_str())
             .unwrap_or("https://example.com")
             .to_string();
 
-        let target = node.config.properties
+        let target = node
+            .config
+            .properties
             .get("target")
             .and_then(|v| v.as_str())
             .unwrap_or("_self")

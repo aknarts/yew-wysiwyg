@@ -7,7 +7,11 @@ use crate::core::widget::{WidgetConfig, WidgetId};
 use crate::serialization::Layout;
 
 /// Build breadcrumb path from root to selected widget
-fn build_breadcrumb_path(layout: &Layout, registry: &WidgetRegistry, widget_id: &WidgetId) -> Vec<(WidgetId, String)> {
+fn build_breadcrumb_path(
+    layout: &Layout,
+    registry: &WidgetRegistry,
+    widget_id: &WidgetId,
+) -> Vec<(WidgetId, String)> {
     let mut path = Vec::new();
     let mut current_id = Some(*widget_id);
 
