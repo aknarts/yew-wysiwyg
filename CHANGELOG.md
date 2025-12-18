@@ -47,5 +47,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Pages deployment for demo
 - WASM bundle size tracking
 
-[Unreleased]: https://github.com/yourusername/yew-wysiwyg/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/yourusername/yew-wysiwyg/releases/tag/v0.1.0
+[Unreleased]: https://github.com/aknarts/yew-wysiwyg/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/aknarts/yew-wysiwyg/releases/tag/v0.1.0

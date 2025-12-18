@@ -2,12 +2,12 @@
 
 A flexible WYSIWYG editor for the [Yew](https://yew.rs) framework with drag-and-drop widgets, serialization support, and extensible theming.
 
-[![CI](https://github.com/yourusername/yew-wysiwyg/workflows/CI/badge.svg)](https://github.com/yourusername/yew-wysiwyg/actions)
+[![CI](https://github.com/aknarts/yew-wysiwyg/workflows/CI/badge.svg)](https://github.com/aknarts/yew-wysiwyg/actions)
 [![crates.io](https://img.shields.io/crates/v/yew-wysiwyg.svg)](https://crates.io/crates/yew-wysiwyg)
 [![docs.rs](https://docs.rs/yew-wysiwyg/badge.svg)](https://docs.rs/yew-wysiwyg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[Demo](https://yourusername.github.io/yew-wysiwyg/) | [Documentation](https://docs.rs/yew-wysiwyg) | [Examples](./yew-wysiwyg-demo)
+[Demo](https://aknarts.github.io/yew-wysiwyg/) | [Documentation](https://docs.rs/yew-wysiwyg) | [Examples](./yew-wysiwyg-demo)
 
 ## Features
 
@@ -299,6 +299,6 @@ Built with:
 ## Support
 
 If you encounter any issues or have questions:
-- Open an issue on [GitHub](https://github.com/yourusername/yew-wysiwyg/issues)
+- Open an issue on [GitHub](https://github.com/aknarts/yew-wysiwyg/issues)
 - Check the [documentation](https://docs.rs/yew-wysiwyg)
 - See the [examples](./yew-wysiwyg-demo)
